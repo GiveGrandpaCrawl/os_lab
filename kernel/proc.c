@@ -681,3 +681,24 @@ procdump(void)
     printf("\n");
   }
 }
+
+// Returns the number of active processes
+int
+getprocs(void)
+{
+  int count = 0;
+  struct proc *p;
+
+  // Loop through the process table
+  acquire(&wait_lock); // Ensure consistency with other operations on process table
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock); // Acquire process lock
+    if (p->state != UNUSED && p->state != ZOMBIE) {
+      count++; // Increment count for each active process
+    }
+    release(&p->lock); // Release process lock
+  }
+  release(&wait_lock); // Release wait_lock
+
+  return count; // Return the count of active processes
+}
