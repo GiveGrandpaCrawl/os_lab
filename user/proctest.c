@@ -1,14 +1,14 @@
 /*
-** test for "getprocs"
-** update time: 2024-3-31
-** author: feng
-** version: 1.3
-** update log :
-** v1.0 -- main()
-** v1.1 -- change the logic of fork() and wait()
-** v1.2 -- printf is not available, add function print_int() using write()
-** v1.3 -- sleep() for synchronization
-*/
+ * test for "getprocs"
+ * update time: 2024-3-31
+ * author: feng
+ * version: 1.3
+ * update log:
+ * v1.0 -- main()
+ * v1.1 -- change the logic of fork() and wait()
+ * v1.2 -- printf is not available, add function print_int() using write()
+ * v1.3 -- sleep() for synchronization
+ */
 
 #include "kernel/types.h"
 #include "kernel/stat.h"

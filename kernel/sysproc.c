@@ -95,3 +95,9 @@ sys_getprocs(void)
 {
  	return getprocs();
 }
+
+uint64
+sys_memtest(void)
+{
+  return memtest();
+}
