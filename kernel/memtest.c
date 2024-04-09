@@ -2,10 +2,12 @@
  * memory allocation test
  * update time: 2024-4-9
  * author: feng
- * version: 1.0
+ * version: 1.3
  * update log:
  * v1.0 -- basic test
- * 
+ * v1.1 -- boundary and random test
+ * v1.2 -- stress test
+ * v1.3 -- overwrite test
  */
 
 #include "types.h"
