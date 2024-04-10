@@ -1,13 +1,14 @@
 /*
  * memory allocation test
- * update time: 2024-4-9
+ * update time: 2024-4-10
  * author: feng
- * version: 1.3
+ * version: 1.4
  * update log:
  * v1.0 -- basic test
  * v1.1 -- boundary and random test
  * v1.2 -- stress test
  * v1.3 -- overwrite test
+ * v1.4 -- more stressful stress test
  */
 
 #include "types.h"
@@ -16,10 +17,6 @@
 #include "spinlock.h"
 #include "riscv.h"
 #include "defs.h"
-
-#define NUM_TESTS 1000
-#define MAX_SIZE 4096
-#define MIN_SIZE 16
 
 void basic_test() {
   printf("Entering basic_test...\n");
@@ -98,7 +95,7 @@ void random_test() {
   // Allocate memory
   for (int i = 0; i < 10; ++i) {
     // Generate random size for memory allocation (between 1 and 1000)
-    unsigned size = (rand() % 1000) + 1;
+    unsigned size = (rand() % 100000) + 1;
     void *ptr = dalloc(size);
     if (ptr != 0) {
       printf("Allocated address: %p, size: %d\n", ptr, size);
@@ -124,24 +121,42 @@ void random_test() {
 void stress_test() {
   printf("Entering stress_test...\n");
 
-  int total_iterations = 114514; // Total number of iterations
+  int total_iterations = 17000; // Total number of iterations
+  int block_size = 1000; // Fixed block size for allocation and deallocation
   int passed = 0;
   int failed = 0;
 
-  // Seed the pseudo-random number generator
-  srand(2000);
-
-  // Perform stress test
-  for (int i = 0; i < total_iterations; ++i) {
-    // Generate random size for memory allocation (between 1 and 1000)
-    unsigned size = (rand() % 1000) + 1;
-    void *ptr = dalloc(size);
-    if (ptr != 0) {
-      dfree(ptr);
-      passed++;
-    } else {
+  // Allocate memory blocks
+  void *ptr_start = dalloc(block_size);
+  if (ptr_start == 0) {
+    failed++;
+  }
+  void *ptr_end = ptr_start;
+  for (int i = 1; i < total_iterations; ++i) {
+    void *temp = dalloc(block_size);
+    if (temp == 0) {
       failed++;
+    } else {
+      ptr_end = temp; // Update the end pointer
     }
+  }
+  printf("The last allocated address: %p\n", ptr_end);
+
+  // Free memory blocks
+  unsigned offset = 1024; // round up of header(16) + data(1000)
+  while (ptr_end != ptr_start) {
+    ptr_end -= offset; // Move back to the previous block
+    if (ptr_end != 0) {
+      dfree(ptr_end);
+      passed++;
+      if (passed % 1000 == 0) {
+        printf("%d tests passed.\n", passed);
+      }
+    }
+  }
+  if (ptr_start != 0) {
+    dfree(ptr_start);
+    passed++;
   }
 
   printf("Stress test completed. \n%d allocations and deallocations attempted. \nPassed: %d, Failed: %d.\n\n", total_iterations, passed, failed);
