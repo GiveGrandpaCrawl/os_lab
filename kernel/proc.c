@@ -1,3 +1,13 @@
+/*
+ * defines and functions of processes
+ * update time: 2024-3-31
+ * co-author: feng
+ * version: 1.1
+ * update log:
+ * v1.0 -- original functions
+ * v1.1 -- add getprocs function, to count the active processes
+ */
+
 #include "types.h"
 #include "param.h"
 #include "memlayout.h"

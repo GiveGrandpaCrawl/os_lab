@@ -1,6 +1,6 @@
 /*
  * memory allocation test
- * update time: 2024-4-10
+ * update time: 2024-4-15
  * author: feng
  * version: 1.4
  * update log:
@@ -121,42 +121,31 @@ void random_test() {
 void stress_test() {
   printf("Entering stress_test...\n");
 
-  int total_iterations = 17000; // Total number of iterations
-  int block_size = 1000; // Fixed block size for allocation and deallocation
+  int total_iterations = 255; // Total number of iterations
+  int block_size = 65537; // 64KB + 1
   int passed = 0;
   int failed = 0;
 
   // Allocate memory blocks
-  void *ptr_start = dalloc(block_size);
-  if (ptr_start == 0) {
-    failed++;
-  }
-  void *ptr_end = ptr_start;
-  for (int i = 1; i < total_iterations; ++i) {
+  void *ptrs[total_iterations];
+  for (int i = 0; i < total_iterations; ++i) {
     void *temp = dalloc(block_size);
     if (temp == 0) {
       failed++;
-    } else {
-      ptr_end = temp; // Update the end pointer
     }
+    ptrs[i] = temp;
   }
-  printf("The last allocated address: %p\n", ptr_end);
+  printf("The last allocated address: %p\n", ptrs[total_iterations - 1]);
 
   // Free memory blocks
-  unsigned offset = 1024; // round up of header(16) + data(1000)
-  while (ptr_end != ptr_start) {
-    ptr_end -= offset; // Move back to the previous block
-    if (ptr_end != 0) {
-      dfree(ptr_end);
+  for (int i = 0; i < total_iterations; ++i) {
+    if (ptrs[i] != 0) {
+      dfree(ptrs[i]);
       passed++;
-      if (passed % 1000 == 0) {
+      if (passed % 10 == 0) {
         printf("%d tests passed.\n", passed);
       }
     }
-  }
-  if (ptr_start != 0) {
-    dfree(ptr_start);
-    passed++;
   }
 
   printf("Stress test completed. \n%d allocations and deallocations attempted. \nPassed: %d, Failed: %d.\n\n", total_iterations, passed, failed);
